@@ -19,7 +19,22 @@ impl<'buf> QueryString<'buf> {
 impl<'buf> From<&'buf str> for QueryString<'buf> {
     fn from(s: &'buf str) -> Self {
         let mut data = HashMap::new();
-        for sub_str in s.split('&') {}
+        for sub_str in s.split('&') {
+            let mut key = sub_str;
+            let mut value = "";
+            if let Some(i) = sub_str.find('=') {
+                key = &key[..i];
+                value = &key[i + 1..];
+            }
+            data.entry(key)
+                .and_modify(|existing| match existing {
+                    Value::Single(prev) => {
+                        *existing = Value::Multiple(vec![prev, value]);
+                    }
+                    Value::Multiple(vec) => vec.push(value),
+                })
+                .or_insert(Value::Single(value));
+        }
         QueryString { data }
     }
 }
