@@ -26,7 +26,7 @@ impl<'buf> From<&'buf str> for QueryString<'buf> {
             let mut value = "";
             if let Some(i) = sub_str.find('=') {
                 key = &key[..i];
-                value = &key[i + 1..];
+                value = &sub_str[i + 1..];
             }
             data.entry(key)
                 .and_modify(|existing| match existing {
